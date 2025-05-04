@@ -110,8 +110,13 @@ class SellerMaster extends Employee implements Sale, Profit
     {
         foreach ($this->getMyEmployee() as $employee) {
             $profit = $employee->getCurrentAccount();
+            if ($profit >= 10000) {
+                $this->currentAccount += $profit * 0.55;
+                $employee->setSavingsAccount($employee->getSavingsAccount() + ($profit * 0.45));    
+            }else{
             $this->currentAccount += $profit * 0.6;
             $employee->setSavingsAccount($employee->getSavingsAccount() + ($profit * 0.4));
+        }
             $employee->setCurrentAccount(0);
         }
     }
@@ -135,12 +140,16 @@ class Manager extends SellerMaster
         foreach ($this->getMyEmployee() as $employee) {
             $employee->collectProfit();
             $profit = $employee->getCurrentAccount();
+            if ($profit >= 10000) {
+                $this->currentAccount += $profit * 0.75;
+                $employee->setSavingsAccount($employee->getSavingsAccount() + ($profit * 0.25));
+            }else{
             $this->currentAccount += $profit * 0.8;
             $employee->setSavingsAccount($employee->getSavingsAccount() + ($profit * 0.2));
-            $employee->setCurrentAccount(0);
         }
+        $employee->setCurrentAccount(0);
     }
-
+    }
 }
 
 class Director extends Manager
@@ -161,11 +170,17 @@ class Director extends Manager
         foreach ($this->getMyEmployee() as $employee) {
             $employee->collectProfit();
             $profit = $employee->getCurrentAccount();
+            if ($profit >= 20000) {
+                $this->currentAccount += $profit * 0.83;
+                $employee->setSavingsAccount($employee->getSavingsAccount() + ($profit * 0.17));
+            }else{
             $this->currentAccount += $profit * 0.9;
             $employee->setSavingsAccount($employee->getSavingsAccount() + ($profit * 0.1));
-            $employee->setCurrentAccount(0);
+            
         }
+        $employee->setCurrentAccount(0);
     }
+}
 }
 class addEmployeeException extends Exception
 {
