@@ -95,15 +95,20 @@ class SellerMaster extends Employee implements Sale, Profit
 {
     use SaleTrait, ProfitTrait;
 
-    public function addEmployee(Sale $employee)
+    public function addEmployee(Employee&Sale $newEmployee)
     {
+        foreach ($this->myEmployee as $employee) {
+            if ($employee->getEmail() === $newEmployee->getEmail()) {
+                throw new MailEmployeeException("Person is already an employee in our company.". $newEmployee->getEmail() ."");
+            }
+        }
         if (count($this->myEmployee) >= 3) {
-            throw new Exception("You can only have 3 subordinates.");
+            throw new CountEmployeeException("You can only have 3 subordinates.");
         }
-        if (!$employee instanceof SellerSubordinate) {
-            throw new addEmployeeException("You can only add subordinates.");
+        if (!$newEmployee instanceof SellerSubordinate) {
+            throw new Exception("You can only add subordinates.");
         }
-        $this->myEmployee[] = $employee;
+        $this->myEmployee[] = $newEmployee;
         return $this;
     }
     public function collectProfit()
@@ -124,15 +129,20 @@ class SellerMaster extends Employee implements Sale, Profit
 
 class Manager extends SellerMaster
 {
-    public function addEmployee(Sale $employee)
+    public function addEmployee(Sale&Employee $newEmployee)
     {
+        foreach ($this->myEmployee as $employee) {
+            if ($employee->getEmail() === $newEmployee->getEmail()) {
+                throw new MailEmployeeException("Person is already an employee in our company.". $newEmployee->getEmail() ."");
+            }
+        }
         if (count($this->myEmployee) >= 4) {
-            throw new Exception("You can only have 4 SellerMaster.");
+            throw new CountEmployeeException("You can only have 4 SellerMaster.");
         }
-        if (!$employee instanceof SellerMaster) {
-            throw new addEmployeeException("You can only add SellerMaster.");
+        if (!$newEmployee instanceof SellerMaster) {
+            throw new Exception("You can only add SellerMaster.");
         }
-        $this->myEmployee[] = $employee;
+        $this->myEmployee[] = $newEmployee;
         return $this;
     }
     public function collectProfit()
@@ -154,15 +164,20 @@ class Manager extends SellerMaster
 
 class Director extends Manager
 {
-    public function addEmployee(Sale $employee)
+    public function addEmployee(Sale&Employee $newEmployee)
     {
+        foreach ($this->myEmployee as $employee) {
+            if ($employee->getEmail() === $newEmployee->getEmail()) {
+                throw new MailEmployeeException("Person is already an employee in our company.". $newEmployee->getEmail() ."");
+            }
+        }
         if (count($this->myEmployee) >= 2) {
             throw new Exception("You can only have 2 Managers.");
         }
-        if (!$employee instanceof Manager) {
-            throw new addEmployeeException("You can only add Manager.");
+        if (!$newEmployee instanceof Manager) {
+            throw new CountEmployeeException("You can only add Manager.");
         }
-        $this->myEmployee[] = $employee;
+        $this->myEmployee[] = $newEmployee;
         return $this;
     }
     public function collectProfit()
@@ -183,15 +198,19 @@ class Director extends Manager
 }
 }
 
-class addEmployeeException extends Exception
+class MailEmployeeException extends Exception
 {
    
+}
+class CountEmployeeException extends Exception
+{
+
 }
 
 trait NamePrice
 {
-    protected $name;
-    protected $price;
+    protected string $name;
+    protected int $price;
 
     public function getName(){
         return $this->name;
@@ -217,13 +236,31 @@ class Product
     }
     public function setBarcode($barcode)
     {
-        $this->barcode = $barcode;
+        if (!is_numeric($barcode)) {
+            throw new PositiveNumberException("Barcode must be a numeric value.");
+        }
+        if ($barcode <= 0) {
+            throw new PositiveNumberException("Barcode must be a number greater than zero.");
+        }
+        if (strlen($barcode) !== 6) {
+            throw new LenghtNumberException("Barcode must have exactly 6 characters.");
+        }
+        $this->barcode = $barcode;        
     }
     public function __construct($name, $price, $barcode){
-        $this->name = $name;
-        $this->price = $price;
-        $this->barcode = $barcode;
+        $this->setName($name);
+        $this->setPrice($price);
+        $this->setBarcode($barcode);
+
     }
+
+}
+class PositiveNumberException extends Exception
+{
+
+}
+class LenghtNumberException extends Exception
+{
 
 }
 
@@ -237,6 +274,13 @@ class Services
     }
     public function setDuration($duration)
     {
+        if (!is_numeric($duration)) {
+            throw new PositiveNumberException("Duration must be a numeric value.");
+        }
+        
+        if ($duration <= 0) {
+            throw new PositiveNumberException("Duration must be a number greater than zero.");
+        }
         $this->duration = $duration;
     }
     public function __construct($name, $price, $duration){
@@ -246,5 +290,130 @@ class Services
     }
 }
 
+/////////////// TESTING ////////////////
+
+/// Creating product and Services ///
+try{
+    $mobilePhone01 = new Product("Samsung S10", 450, 123456);
+}
+catch(PositiveNumberException $e){
+    echo $e->getMessage();
+}
+catch(LengthException $e){
+    echo $e->getMessage();
+}
+catch(Exception $e){
+    echo $e->getMessage();
+}
+
+$mobilePhone02 = new Product("Samsung S11", 420, 456123);
+$mobilePhone03 = new Product("Samsung S12", 490, 789456);
+$bag01 = new Product("Fenix", 100, 147852);
+$bag02 = new Product("Addidas", 120, 723145);
+$bag03 = new Product("Milano", 70, 481526);
+$lapTop01 = new Product("Asus", 550, 987258);
+$lapTop02 = new Product("HP", 300, 254136);
+try{
+    $beautySalon01 = new Services("Haircut", 12, 30);    
+}
+catch(PositiveNumberException $e){
+    echo $e->getMessage();
+}
+$beautySalon01 = new Services("Haircut", 12, 30);
+$beautySalon02 = new Services("Shaving", 10, 15);
+$beautySalon03 = new Services("Blow-drying", 18, 45);
+$beautySalon04 = new Services("Massage", 50, 50);
+
+/// SubordinateSellers ///
+$andjelaSub01 = new SellerSubordinate("andjela01@gmail.com");
+try{
+    $andjelaSub01->sellProductOrServices($bag01, 3);
+}
+catch(PositiveNumberException $e){
+    echo "".$e->getMessage()."";
+}
+catch(Exception $e){
+    echo "".$e->getMessage()."";
+}
+$andjelaSub02 = new SellerSubordinate("andjela02@gmail.com");
+$andjelaSub02->sellProductOrServices($bag02, 3);
+$andjelaSub03 = new SellerSubordinate("andjela03@gmail.com");
+$andjelaSub03->sellProductOrServices($bag03, 3);
+$andjelaSub04 = new SellerSubordinate("andjela04@gmail.com");
+$andjelaSub04->sellProductOrServices($lapTop01, 1);
+$andjelaSub05 = new SellerSubordinate("andjela05@gmail.com");
+$andjelaSub05->sellProductOrServices($lapTop02, 5);
+$andjelaSub06 = new SellerSubordinate("andjela06@gmail.com");
+$andjelaSub06->sellProductOrServices($mobilePhone01, 2);
+$andjelaSub07 = new SellerSubordinate("andjela07@gmail.com");
+$andjelaSub07->sellProductOrServices($mobilePhone02, 2);
+$andjelaSub08 = new SellerSubordinate("andjela08@gmail.com");
+$andjelaSub08->sellProductOrServices($mobilePhone03, 2);
+
+/// MasterSellers ///
+$markoMaster01 = new SellerMaster("marko01@gamil.com");
+
+$markoMaster01->sellProductOrServices($beautySalon01, 5);
+$markoMaster02 = new SellerMaster("marko02@gamil.com");
+$markoMaster02->sellProductOrServices($beautySalon02, 7);
+$markoMaster03 = new SellerMaster("marko03@gamil.com");
+$markoMaster03->sellProductOrServices($beautySalon03, 8);
+$markoMaster04 = new SellerMaster("marko04@gamil.com");
+$markoMaster04->sellProductOrServices($beautySalon04, 2);
+
+/// Managers ///
+$nemanjaMng01 = new Manager("nemanja01@gmail.com");
+$nemanjaMng02 = new Manager("nemanja02@gmail.com");
+
+/// DIRECTOR ///
+$dejanDirector = new Director("dejan01@gmial.com");
+
+/// Adding employee ///
+try{
+    $markoMaster01->addEmployee($andjelaSub01)->addEmployee($andjelaSub02);
+    $markoMaster02->addEmployee($andjelaSub03)->addEmployee($andjelaSub04);
+    $markoMaster03->addEmployee($andjelaSub05)->addEmployee($andjelaSub06);
+    $markoMaster04->addEmployee($andjelaSub07)->addEmployee($andjelaSub08);    
+}
+catch(MailEmployeeException $e){
+    echo $e->getMessage();
+}
+catch(MailEmployeeException $e){
+    echo $e->getMessage();
+}
+catch(Exception $e){
+    echo "".$e->getMessage()."";
+}
+try{
+    $nemanjaMng01->addEmployee($markoMaster01)->addEmployee($markoMaster02);
+    $nemanjaMng02->addEmployee($markoMaster03)->addEmployee($markoMaster04);    
+}
+catch(MailEmployeeException $e){
+    echo $e->getMessage();
+}
+catch(MailEmployeeException $e){
+    echo $e->getMessage();
+}
+catch(Exception $e){
+    echo "".$e->getMessage()."";
+}
+try{
+    $dejanDirector->addEmployee($nemanjaMng01)->addEmployee($nemanjaMng02);
+}
+catch(MailEmployeeException $e){
+    echo $e->getMessage();
+}
+catch(CountEmployeeException $e){
+    echo $e->getMessage();
+}
+catch(Exception $e){
+    echo "".$e->getMessage()."";
+}
+$dejanDirector->collectProfit();
 
 ?>
+<pre>
+<?php
+var_dump($dejanDirector);
+?>
+</pre>
