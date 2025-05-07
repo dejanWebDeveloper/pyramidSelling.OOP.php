@@ -182,93 +182,69 @@ class Director extends Manager
     }
 }
 }
+
 class addEmployeeException extends Exception
 {
    
 }
 
-///// test /////
-
-$jovanSub = new SellerSubordinate("jovan@gmail.com");
-$jovanSub->setCurrentAccount(10000);
-$milosSub = new SellerSubordinate("milos@gmail.com");
-$milosSub->setCurrentAccount(1000);
-$petarSub = new SellerSubordinate("petar@mail.com");
-$petarSub->setCurrentAccount(1000);
-
-$mitarMr = new SellerMaster("mitar@gmail.com");
-//$mitarMr->setCurrentAccount(1000);
-$markoMr = new SellerMaster("master@gmail.com");
-//$markoMr->setCurrentAccount(1000);
-$jovicaMr = new SellerMaster("jovica@gmail.com");
-//$jovicaMr->setCurrentAccount(1000);
-$miljanMr = new SellerMaster("miljan@gmail.com");
-//$miljanMr->setCurrentAccount(1000);
-$ljuboMr = new SellerMaster("ljubo@gmail.com");
-//$ljuboMr->setCurrentAccount(1000);
-
-$djordjeMg = new Manager("djordje@gmail.com");
-$milenaMg = new Manager("milena@gmail.com");
-$milicaMg = new Manager("milica@gmail.com");
-//$djordjeMg->setCurrentAccount(1000);
-
-$nemanjaDr = new Director("nemanja@gmail.com");
-
-try
+trait NamePrice
 {
-$markoMr->addEmployee($jovanSub)->addEmployee($milosSub)->addEmployee($petarSub);
+    protected $name;
+    protected $price;
+
+    public function getName(){
+        return $this->name;
+    }
+    public function setName($name){
+        $this->name = $name;
+    }
+    public function getPrice(){
+        return $this->price;
+    }
+    public function setPrice($price){
+        $this->price = $price;
+    }
 }
-catch (addEmployeeException $e)
+
+class Product 
 {
-    echo $e->getMessage();
-}
-catch (Exception $e)
-{
-    echo $e->getMessage();
+    use NamePrice;
+    protected $barcode;
+    public function getBarcode()
+    {
+        return $this->barcode;
+    }
+    public function setBarcode($barcode)
+    {
+        $this->barcode = $barcode;
+    }
+    public function __construct($name, $price, $barcode){
+        $this->name = $name;
+        $this->price = $price;
+        $this->barcode = $barcode;
+    }
 
 }
 
-try
+class Services
 {
-    $djordjeMg->addEmployee($mitarMr)->addEmployee($jovicaMr)->addEmployee($miljanMr)->addEmployee($markoMr);
+    use NamePrice;
+    protected $duration;
+    public function getDuration()
+    {
+        return $this->duration;
+    }
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
+    }
+    public function __construct($name, $price, $duration){
+        $this->setName($name);
+        $this->setPrice($price);
+        $this->setDuration($duration);
+    }
 }
-catch (addEmployeeException $e)
-{
-    echo $e->getMessage();
-}
-catch (Exception $e)
-{
-    echo $e->getMessage();
-}
-
-try
-{
-    $nemanjaDr->addEmployee($djordjeMg)->addEmployee($milenaMg);
-}
-catch (addEmployeeException $e)
-{
-    echo $e->getMessage();
-}
-catch (Exception $e)
-{
-    echo $e->getMessage();
-}
-
-//$markoMr->collectProfit();
-//$djordjeMg->collectProfit();
-$nemanjaDr->collectProfit();
-///// osmisli proveru validacije /////
-
-?>
-<pre>
-<?php
-var_dump($nemanjaDr);
-?>
-</pre>
-<?php
-
-
-
 
 
 ?>
