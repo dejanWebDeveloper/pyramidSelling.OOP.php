@@ -187,7 +187,85 @@ class addEmployeeException extends Exception
    
 }
 
+///// test /////
 
+$jovanSub = new SellerSubordinate("jovan@gmail.com");
+$jovanSub->setCurrentAccount(10000);
+$milosSub = new SellerSubordinate("milos@gmail.com");
+$milosSub->setCurrentAccount(1000);
+$petarSub = new SellerSubordinate("petar@mail.com");
+$petarSub->setCurrentAccount(1000);
+
+$mitarMr = new SellerMaster("mitar@gmail.com");
+//$mitarMr->setCurrentAccount(1000);
+$markoMr = new SellerMaster("master@gmail.com");
+//$markoMr->setCurrentAccount(1000);
+$jovicaMr = new SellerMaster("jovica@gmail.com");
+//$jovicaMr->setCurrentAccount(1000);
+$miljanMr = new SellerMaster("miljan@gmail.com");
+//$miljanMr->setCurrentAccount(1000);
+$ljuboMr = new SellerMaster("ljubo@gmail.com");
+//$ljuboMr->setCurrentAccount(1000);
+
+$djordjeMg = new Manager("djordje@gmail.com");
+$milenaMg = new Manager("milena@gmail.com");
+$milicaMg = new Manager("milica@gmail.com");
+//$djordjeMg->setCurrentAccount(1000);
+
+$nemanjaDr = new Director("nemanja@gmail.com");
+
+try
+{
+$markoMr->addEmployee($jovanSub)->addEmployee($milosSub)->addEmployee($petarSub);
+}
+catch (addEmployeeException $e)
+{
+    echo $e->getMessage();
+}
+catch (Exception $e)
+{
+    echo $e->getMessage();
+
+}
+
+try
+{
+    $djordjeMg->addEmployee($mitarMr)->addEmployee($jovicaMr)->addEmployee($miljanMr)->addEmployee($markoMr);
+}
+catch (addEmployeeException $e)
+{
+    echo $e->getMessage();
+}
+catch (Exception $e)
+{
+    echo $e->getMessage();
+}
+
+try
+{
+    $nemanjaDr->addEmployee($djordjeMg)->addEmployee($milenaMg);
+}
+catch (addEmployeeException $e)
+{
+    echo $e->getMessage();
+}
+catch (Exception $e)
+{
+    echo $e->getMessage();
+}
+
+//$markoMr->collectProfit();
+//$djordjeMg->collectProfit();
+$nemanjaDr->collectProfit();
+///// osmisli proveru validacije /////
+
+?>
+<pre>
+<?php
+var_dump($nemanjaDr);
+?>
+</pre>
+<?php
 
 
 
