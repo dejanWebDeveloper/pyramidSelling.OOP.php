@@ -1,27 +1,36 @@
 <?php
 ///// model class /////
+/**
+ * model class
+ */
 abstract class Employee
 {
-    protected $email;
-    protected $currentAccount = 0;
-    protected $savingsAccount = 0;
-
-    public function getEmail()
+    protected string $email;
+    /**
+     *
+     * @var int
+     */
+    protected int $currentAccount = 0;
+    protected int $savingsAccount = 0;
+    /**
+     * @return string
+     */
+    public function getEmail(): string
     {
         return $this->email;
     }
-
-    public function getCurrentAccount()
+    public function getCurrentAccount(): int
     {
         return $this->currentAccount;
     }
-
-    public function getSavingsAccount()
+    /**
+     * @return int
+     */
+    public function getSavingsAccount(): int
     {
         return $this->savingsAccount;
     }
-
-    public function setEmail($email)
+    public function setEmail($email): void
     {
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $this->email = $email;
@@ -29,8 +38,7 @@ abstract class Employee
             throw new Exception("Invalid email format");
         }
     }
-
-    public function setCurrentAccount($currentAccount)
+    public function setCurrentAccount($currentAccount): void
     {
         if (is_numeric($currentAccount) && $currentAccount >= 0) {
             $this->currentAccount = $currentAccount;
@@ -38,8 +46,7 @@ abstract class Employee
             throw new Exception("Invalid current account balance");
         }
     }
-
-    public function setSavingsAccount($savingsAccount)
+    public function setSavingsAccount($savingsAccount): void
     {
         if (is_numeric($savingsAccount) && $savingsAccount >= 0) {
             $this->savingsAccount = $savingsAccount;
@@ -47,7 +54,7 @@ abstract class Employee
             throw new Exception("Invalid savings account balance");
         }
     }
-    public function displaySavingsAccount()
+    public function displaySavingsAccount(): void
     {
         echo "The savings account balance is: ". $this->savingsAccount. "$ <br>";
     }
@@ -55,14 +62,12 @@ abstract class Employee
     {
         $this->setEmail($email);
     }
-    
 }
 ///// interfaces for sale and profit /////
 interface Sale
 {
     public function sellProductOrServices($product, $quantity);
 }
-
 interface Profit
 {
     public function collectProfit();
@@ -70,16 +75,16 @@ interface Profit
 ///// traits for sale and profit /////
 trait SaleTrait
 {
-    public function sellProductOrServices($product, $quantity)
+    public function sellProductOrServices($product, $quantity): void
     {
         $this->currentAccount += $product->getPrice() * $quantity;
     }
 }
 trait ProfitTrait
 {
-    protected $myEmployee = [];
+    protected array $myEmployee = [];
 
-    public function getMyEmployee()
+    public function getMyEmployee(): array
     {
         return $this->myEmployee;
     }
@@ -95,11 +100,11 @@ class SellerMaster extends Employee implements Sale, Profit
 {
     use SaleTrait, ProfitTrait;
 
-    public function addEmployee(Employee&Sale $newEmployee)
+    public function addEmployee(Employee&Sale $newEmployee): static
     {
         foreach ($this->myEmployee as $employee) {
             if ($employee->getEmail() === $newEmployee->getEmail()) {
-                throw new MailEmployeeException("Person is already an employee in our company.". $newEmployee->getEmail() ."");
+                throw new MailEmployeeException("Person is already an employee in our company.". $newEmployee->getEmail());
             }
         }
         if (count($this->myEmployee) >= 3) {
@@ -126,10 +131,9 @@ class SellerMaster extends Employee implements Sale, Profit
         }
     }
 }
-
 class Manager extends SellerMaster
 {
-    public function addEmployee(Sale&Employee $newEmployee)
+    public function addEmployee(Sale&Employee $newEmployee): static
     {
         foreach ($this->myEmployee as $employee) {
             if ($employee->getEmail() === $newEmployee->getEmail()) {
@@ -164,11 +168,11 @@ class Manager extends SellerMaster
 
 class Director extends Manager
 {
-    public function addEmployee(Sale&Employee $newEmployee)
+    public function addEmployee(Sale&Employee $newEmployee): static
     {
         foreach ($this->myEmployee as $employee) {
             if ($employee->getEmail() === $newEmployee->getEmail()) {
-                throw new MailEmployeeException("Person is already an employee in our company.". $newEmployee->getEmail() ."");
+                throw new MailEmployeeException("Person is already an employee in our company." . $newEmployee->getEmail() . "");
             }
         }
         if (count($this->myEmployee) >= 2) {
@@ -197,16 +201,12 @@ class Director extends Manager
     }
 }
 }
-
 class MailEmployeeException extends Exception
 {
-   
 }
 class CountEmployeeException extends Exception
 {
-
 }
-
 trait NamePrice
 {
     protected string $name;
@@ -218,23 +218,29 @@ trait NamePrice
     public function setName($name){
         $this->name = $name;
     }
-    public function getPrice(){
+    public function getPrice(): int
+    {
         return $this->price;
     }
-    public function setPrice($price){
+    public function setPrice($price): void
+    {
         $this->price = $price;
     }
 }
-
 class Product 
 {
     use NamePrice;
-    protected $barcode;
-    public function getBarcode()
+    protected int $barcode;
+    public function getBarcode(): int
     {
         return $this->barcode;
     }
-    public function setBarcode($barcode)
+
+    /**
+     * @throws PositiveNumberException
+     * @throws LenghtNumberException
+     */
+    public function setBarcode($barcode): void
     {
         if (!is_numeric($barcode)) {
             throw new PositiveNumberException("Barcode must be a numeric value.");
@@ -247,13 +253,15 @@ class Product
         }
         $this->barcode = $barcode;        
     }
+    /**
+     * @throws PositiveNumberException
+     * @throws LenghtNumberException
+     */
     public function __construct($name, $price, $barcode){
         $this->setName($name);
         $this->setPrice($price);
         $this->setBarcode($barcode);
-
     }
-
 }
 class PositiveNumberException extends Exception
 {
@@ -263,7 +271,6 @@ class LenghtNumberException extends Exception
 {
 
 }
-
 class Services
 {
     use NamePrice;
@@ -272,7 +279,11 @@ class Services
     {
         return $this->duration;
     }
-    public function setDuration($duration)
+
+    /**
+     * @throws PositiveNumberException
+     */
+    public function setDuration($duration): void
     {
         if (!is_numeric($duration)) {
             throw new PositiveNumberException("Duration must be a numeric value.");
@@ -283,6 +294,10 @@ class Services
         }
         $this->duration = $duration;
     }
+
+    /**
+     * @throws PositiveNumberException
+     */
     public function __construct($name, $price, $duration){
         $this->setName($name);
         $this->setPrice($price);
@@ -293,19 +308,7 @@ class Services
 /////////////// TESTING ////////////////
 
 /// Creating product and Services ///
-try{
-    $mobilePhone01 = new Product("Samsung S10", 450, 123456);
-}
-catch(PositiveNumberException $e){
-    echo $e->getMessage();
-}
-catch(LengthException $e){
-    echo $e->getMessage();
-}
-catch(Exception $e){
-    echo $e->getMessage();
-}
-
+$mobilePhone01 = new Product("Samsung S10", 450, 123456);
 $mobilePhone02 = new Product("Samsung S11", 420, 456123);
 $mobilePhone03 = new Product("Samsung S12", 490, 789456);
 $bag01 = new Product("Fenix", 100, 147852);
@@ -313,28 +316,40 @@ $bag02 = new Product("Addidas", 120, 723145);
 $bag03 = new Product("Milano", 70, 481526);
 $lapTop01 = new Product("Asus", 550, 987258);
 $lapTop02 = new Product("HP", 300, 254136);
-try{
-    $beautySalon01 = new Services("Haircut", 12, 30);    
+
+try {
+    $beautySalon01 = new Services("Haircut", 12, 30);
 }
-catch(PositiveNumberException $e){
+catch (PositiveNumberException $e) {
     echo $e->getMessage();
 }
-$beautySalon01 = new Services("Haircut", 12, 30);
-$beautySalon02 = new Services("Shaving", 10, 15);
-$beautySalon03 = new Services("Blow-drying", 18, 45);
-$beautySalon04 = new Services("Massage", 50, 50);
-
+try {
+    $beautySalon01 = new Services("Haircut", 12, 30);
+}
+catch (PositiveNumberException $e) {
+    echo $e->getMessage();
+}
+try {
+    $beautySalon02 = new Services("Shaving", 10, 15);
+}
+catch (PositiveNumberException $e) {
+    echo $e->getMessage();
+}
+try {
+    $beautySalon03 = new Services("Blow-drying", 18, 45);
+}
+catch (PositiveNumberException $e) {
+    echo $e->getMessage();
+}
+try {
+    $beautySalon04 = new Services("Massage", 50, 50);
+}
+catch (PositiveNumberException $e) {
+    echo $e->getMessage();
+}
 /// SubordinateSellers ///
 $andjelaSub01 = new SellerSubordinate("andjela01@gmail.com");
-try{
-    $andjelaSub01->sellProductOrServices($bag01, 3);
-}
-catch(PositiveNumberException $e){
-    echo "".$e->getMessage()."";
-}
-catch(Exception $e){
-    echo "".$e->getMessage()."";
-}
+$andjelaSub01->sellProductOrServices($bag01, 3);
 $andjelaSub02 = new SellerSubordinate("andjela02@gmail.com");
 $andjelaSub02->sellProductOrServices($bag02, 3);
 $andjelaSub03 = new SellerSubordinate("andjela03@gmail.com");
@@ -369,46 +384,65 @@ $nemanjaMng02 = new Manager("nemanja02@gmail.com");
 $dejanDirector = new Director("dejan01@gmial.com");
 
 /// Adding employee ///
-try{
+
+try {
     $markoMaster01->addEmployee($andjelaSub01)->addEmployee($andjelaSub02);
+} catch (CountEmployeeException $e) {
+
+} catch (MailEmployeeException $e) {
+
+} catch (Exception $e) {
+}
+try {
     $markoMaster02->addEmployee($andjelaSub03)->addEmployee($andjelaSub04);
+} catch (CountEmployeeException $e) {
+
+} catch (MailEmployeeException $e) {
+
+} catch (Exception $e) {
+}
+try {
     $markoMaster03->addEmployee($andjelaSub05)->addEmployee($andjelaSub06);
-    $markoMaster04->addEmployee($andjelaSub07)->addEmployee($andjelaSub08);    
+} catch (CountEmployeeException $e) {
+
+} catch (MailEmployeeException $e) {
+
+} catch (Exception $e) {
 }
-catch(MailEmployeeException $e){
-    echo $e->getMessage();
+try {
+    $markoMaster04->addEmployee($andjelaSub07)->addEmployee($andjelaSub08);
+} catch (CountEmployeeException $e) {
+
+} catch (MailEmployeeException $e) {
+
+} catch (Exception $e) {
 }
-catch(MailEmployeeException $e){
-    echo $e->getMessage();
-}
-catch(Exception $e){
-    echo "".$e->getMessage()."";
-}
-try{
+
+try {
     $nemanjaMng01->addEmployee($markoMaster01)->addEmployee($markoMaster02);
-    $nemanjaMng02->addEmployee($markoMaster03)->addEmployee($markoMaster04);    
+} catch (CountEmployeeException $e) {
+
+} catch (MailEmployeeException $e) {
+
+} catch (Exception $e) {
 }
-catch(MailEmployeeException $e){
-    echo $e->getMessage();
+try {
+    $nemanjaMng02->addEmployee($markoMaster03)->addEmployee($markoMaster04);
+} catch (CountEmployeeException $e) {
+
+} catch (MailEmployeeException $e) {
+
+} catch (Exception $e) {
 }
-catch(MailEmployeeException $e){
-    echo $e->getMessage();
-}
-catch(Exception $e){
-    echo "".$e->getMessage()."";
-}
-try{
+try {
     $dejanDirector->addEmployee($nemanjaMng01)->addEmployee($nemanjaMng02);
+} catch (CountEmployeeException $e) {
+
+} catch (MailEmployeeException $e) {
+
+} catch (Exception $e) {
 }
-catch(MailEmployeeException $e){
-    echo $e->getMessage();
-}
-catch(CountEmployeeException $e){
-    echo $e->getMessage();
-}
-catch(Exception $e){
-    echo "".$e->getMessage()."";
-}
+
 $dejanDirector->collectProfit();
 
 ?>
