@@ -1,0 +1,15 @@
+{
+    "name": "dejan/20.pyramid-selling",
+    "authors": [
+        {
+            "name": "Dejan",
+            "email": "dejan_web@outlook.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "PyramidSelling\\": "src\\"
+        }
+    }
+}
